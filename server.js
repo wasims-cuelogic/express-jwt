@@ -1,26 +1,35 @@
 import express from 'express';
-let app = express();
 import bodyParser from 'body-parser';
+import cors from "cors";
 import mongoose from 'mongoose';
 global.config = require('./config/config');
 
-//import jwt from 'jsonwebtoken';
-//import User from './models/user';
-
 import { router } from "./routes";
+import winston from 'winston';
 
-mongoose.connect("mongodb://localhost/demo");
+winston.info("Starting application");
+
+let app = express();
+
+winston.info("Initializing express");
+
+mongoose.set('debug', true);
+
+mongoose.connect("mongodb://" + global.config.MONGODB_HOST + "/" + global.config.MONGODB_COLLECTION_NAME);
+
+mongoose.connection.on('error', function () {
+    winston.info('Mongoose connection error');
+});
 
 app.use(bodyParser.urlencoded({ "extended": true }));
 app.use(bodyParser.json());
+app.use(cors());
 
-//app.use(require('./controllers'));
 app.use("/", router);
 
-app.get('/', (req, res) => {
-    res.send('hello world');
-});
+winston.info("server.js listen: Going to start app on the provided port. ");
+winston.info("Creating HTTP server on port: %s", global.config.PORT);
 
-app.listen(3000, () => {
-    console.log('App running on 3000');
+app.listen(global.config.PORT, () => {
+    winston.info("HTTP Server listening on port: %s", global.config.PORT);
 });

@@ -28,6 +28,7 @@ export class UserController {
 
             this.userModel
                 .findOne(data)
+                .select('-password -__v')
                 .then((user) => {
                     if (user) {
                         let token = jwt.sign(user.toObject(), config.jwt_secret, {
@@ -99,6 +100,7 @@ export class UserController {
                 .findOne({
                     _id: id
                 })
+                .select('-password -__v')
                 .then((user) => {
                     if (user) {
                         resolve(user);
