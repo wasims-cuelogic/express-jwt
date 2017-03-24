@@ -29,9 +29,8 @@ export class UserController {
             this.userModel
                 .findOne(data)
                 .then((user) => {
-                    console.log("In", user)
                     if (user) {
-                        let token = jwt.sign(user, config.jwt_secret, {
+                        let token = jwt.sign(user.toObject(), config.jwt_secret, {
                             expiresIn: 1440 // expires in 1 hour
                         });
                         resolve(user);
