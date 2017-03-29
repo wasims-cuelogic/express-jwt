@@ -27,9 +27,18 @@ app.use(cors());
 
 app.use("/", router);
 
+// Just to test our server is working
+app.get('/api', function (req, res) {
+    res.send({
+        version: '1.0.0'
+    });
+});
+
 winston.info("server.js listen: Going to start app on the provided port. ");
 winston.info("Creating HTTP server on port: %s", global.config.PORT);
 
 app.listen(global.config.PORT, () => {
     winston.info("HTTP Server listening on port: %s", global.config.PORT);
 });
+
+module.exports = app;

@@ -91,6 +91,32 @@ export class UserController {
     }
 
     /**
+     * Method to find all users
+     */
+
+    findAllUsers = (req, res, next) => {
+        return new Promise((resolve, reject) => {
+            this.userModel
+                .find()
+                .select('-password -__v')
+                .then((users) => {
+                    if (users) {
+                        resolve(users);
+                        res.json({ status: true, users, "message": "Users found" });
+                        next();
+                    } else {
+                        reject("No User not found!");
+                        reject(res.json({ status: false, error: "No Users not found!" }));
+                        next();
+                    }
+                })
+                .catch((err) => {
+                    next(error);
+                })
+        })
+    }
+
+    /**
      * Method to find user by id
      */
     findUserById = (req, res, next) => {
@@ -117,6 +143,93 @@ export class UserController {
                 });
         });
 
+    }
+
+    /**
+     * Update user by id
+     */
+
+    updateUser = (req, res, next) => {
+        let userId = req.params.id;
+
+        return new Promise((resolve, reject) => {
+            const reqObj = { name: req.body.name };
+
+            this.userModel
+                .findOne({
+                    _id: userId
+                })
+                .then((user) => {
+                    if (user) {
+                        this.userModel
+                            .findOneAndUpdate(
+                            {
+                                _id: userId
+                            },
+
+                            { $set: reqObj },
+                            { new: true },
+                            (err, objectUpdate) => {
+                                if (err) {
+                                    reject(err);
+                                    res.json({ error: err });
+                                }
+                                else {
+                                    resolve(objectUpdate);
+                                    res.json({ user: objectUpdate });
+                                }
+                            });
+                    } else {
+                        reject("No User not found!");
+                        reject(res.json({ status: false, error: "No User not found!" }));
+                        next();
+                    }
+                })
+                .catch((error) => {
+                    next(error);
+                });
+        })
+    }
+
+    /**
+     * Delete user by id
+     */
+
+    deleteUser = (req, res, next) => {
+        let userId = req.params.id;
+
+        return new Promise((resolve, reject) => {
+
+            this.userModel
+                .findOne({
+                    _id: userId
+                })
+                .then((user) => {
+                    if (user) {
+                        this.userModel
+                            .remove(
+                            {
+                                _id: userId
+                            },
+                            (err) => {
+                                if (err) {
+                                    reject(err);
+                                    res.json({ error: err });
+                                }
+                                else {
+                                    resolve();
+                                    res.json({ status: true, message: "User deleted successfully" })
+                                }
+                            });
+                    } else {
+                        reject(res.json({ status: false, error: "No User not found!" }));
+                        next();
+                    }
+                })
+                .catch((error) => {
+                    next(error);
+                });
+        })
     }
 }
 

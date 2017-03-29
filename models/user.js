@@ -1,13 +1,3 @@
-// import mongoose from 'mongoose';
-// import bcrypt from 'bcryptjs';
-// const Schema = mongoose.Schema;
-
-// export default mongoose.model('User', new Schema({
-//     name: { type: String },
-//     email: { type: String, required: true },
-//     password: { type: String, required: true },
-// }));
-
 import mongoose from 'mongoose';
 import bcrypt from "bcryptjs";
 const Schema = mongoose.Schema;
