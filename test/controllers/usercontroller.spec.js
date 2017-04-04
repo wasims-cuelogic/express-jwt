@@ -1,54 +1,98 @@
-// import chai from "chai";
-// import mongoose from "mongoose";
-// import mockgoose from "mockgoose";
-// import httpMocks from "node-mocks-http";
-// import sinon from "sinon";
-// import { UserController } from "../../controllers/UserController";
-// import UserModel from "../../models/user";
+import chai from 'chai';
+const expect = chai.expect;
+import request from 'supertest';
+import app from '../../server.js';
+import jwt from 'jsonwebtoken';
+import config from '../../config/config';
 
+describe('POST /api/user/signin', () => {
+    it('it responds with 401 status code if bad username or password', done => {
+        request(app)
+            .post('/api/user/signin')
+            .type('json')
+            .send('{"username":"bad","password":"wrong"}')
+            .expect(401)
+            .end((err, res) => {
+                if (err) return done(err);
+                done();
+            });
+    });
 
-// let expect = chai.expect;
+    it('it responds with 200 status code if good username or password', done => {
+        request(app)
+            .post('/api/user/signin')
+            .type('json')
+            .send('{"email":"wasim.sayyed@cuelogic.com3","password":"wasim@123"}')
+            .expect(200)
+            .end((err, res) => {
+                if (err) return done(err);
+                done();
+            });
+    });
 
-describe("Functions for user controller=>", () => {
+    it('it returns JWT token and user if good username or password', done => {
+        request(app)
+            .post('/api/user/signin')
+            .type('json')
+            .send('{"email":"wasim.sayyed@cuelogic.com3","password":"wasim@123"}')
+            .end((err, res) => {
+                if (err) return done(err);
 
-    // let res, next;
+                expect(res.body).have.property('token');
+                expect(res.body).have.property('user');
 
-    // before((done) => {
-    //     mockgoose(mongoose).then(function () {
-    //         mongoose.connect("mongodb://localhost:27017/user_sample", function (err) {
-    //             done(err);
-    //         })
-    //     });
+                done();
+            });
+    });
+});
 
-    //     res = httpMocks.createResponse();
+describe('GET /api/user', function () {
+    it('it responds with 401 status code if no authorization header', function (done) {
+        request(app).get('/api/user').expect(403).end(function (err, res) {
+            if (err) return done(err);
+            done();
+        });
+    });
 
-    //     next = (err) => {
-    //         return new Promise((resolve, reject) => {
-    //             resolve("");
-    //         })
-    //     }
-    // })
+    it('it responds with JSON if no authorization header', function (done) {
+        request(app).get('/api/user').expect('Content-Type', /json/).end(function (err, res) {
+            if (err) return done(err);
+            done();
+        });
+    });
 
-    // after(() => {
-    //     mockgoose.reset();
-    //     mongoose.connection.close();
-    // })
+    it('it responds with 200 status code if good authorization header', function (done) {
+        var token = jwt.sign({
+            id: 1,
+        }, config.jwt_secret, { expiresIn: 60 * 60 });
+        request(app)
+            .get('/api/user')
+            .set('token', token)
+            .expect(200)
+            .end(function (err, res) {
+                if (err) return done(err);
+                done();
+            });
+    });
 
-    // describe("Get Users", () => {
-    //     it('should not be able to access users without token', (done) => {
-    //         api.get('/api/user')
-    //             .set('Accept', 'application/x-www-form-urlencoded')
-    //             .send({
-    //                 "id": "58d3ad422f4fa2525694cfaf"
-    //             })
-    //             .expect(403)
-    //             .end((err, res) => {
-    //                 if (err) return done(err);
-    //                 expect(res.message.text).to.equal("Token required")
-    //                 done();
-    //             })
+    it('it responds with JSON if good authorization header', function (done) {
+        var token = jwt.sign({
+            id: 1,
+        }, config.jwt_secret, { expiresIn: 60 * 60 });
+        request(app)
+            .get('/api/user')
+            .set('token', token)
+            .expect('Content-Type', /json/)
+            .end(function (err, res) {
+                if (err) return done(err);
 
-    //     });
-    // });
+                expect(res.body).have.property('users');
 
-})
+                done();
+            });
+    });
+
+    it("it responds", function (done) {
+
+    })
+});

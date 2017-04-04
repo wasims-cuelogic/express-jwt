@@ -38,8 +38,11 @@ export class UserController {
                         res.json({ status: true, token, user, "message": "Authentication successful" });
                         next();
                     } else {
-                        reject("Invalid credentials");
-                        reject(res.json({ status: false, error: "Invalid credentials" }));
+                        reject("Invalid credentials");                        
+                        reject(res.status(401).send({
+                            status: false,
+                            error: "Invalid credentials"
+                        }))
                         next();
                     }
                 })
@@ -106,7 +109,7 @@ export class UserController {
                         next();
                     } else {
                         reject("No User not found!");
-                        reject(res.json({ status: false, error: "No Users not found!" }));
+                        reject(res.json(401, { status: false, error: "No Users not found!" }));
                         next();
                     }
                 })

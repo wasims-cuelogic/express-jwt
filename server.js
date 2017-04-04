@@ -13,7 +13,7 @@ let app = express();
 
 winston.info("Initializing express");
 
-mongoose.set('debug', true);
+mongoose.set('debug', false);
 
 mongoose.connect("mongodb://" + global.config.MONGODB_HOST + "/" + global.config.MONGODB_COLLECTION_NAME);
 
