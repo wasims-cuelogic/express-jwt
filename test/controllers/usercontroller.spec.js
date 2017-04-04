@@ -93,6 +93,6 @@ describe('GET /api/user', function () {
     });
 
     it("it responds", function (done) {
-
+        console.log("Testing jenkins")
     })
 });
