@@ -29,7 +29,7 @@ export class UserController {
             this.userModel
                 .findOne(data)
                 .select('-password -__v')
-                .then((user) => {
+                .then((user) => {                    
                     if (user) {
                         let token = jwt.sign(user.toObject(), config.jwt_secret, {
                             expiresIn: 1440 // expires in 1 hour
@@ -38,7 +38,6 @@ export class UserController {
                         res.json({ status: true, token, user, "message": "Authentication successful" });
                         next();
                     } else {
-                        reject("Invalid credentials");                        
                         reject(res.status(401).send({
                             status: false,
                             error: "Invalid credentials"
